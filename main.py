@@ -59,7 +59,7 @@ async def checkforvideos():
 
       #sending the msg in discord channel
       #you can mention any role like this if you want
-      msg = f"@ everyone {data[str(youtube_channel)]['channel_name']} Just Uploaded A Video Or He is Live Go Check It Out: {latest_video_url}"
+      msg = f"@everyone {data[str(youtube_channel)]['channel_name']} Just Uploaded A Video Or He is Live Go Check It Out: {latest_video_url}"
       #if you'll send the url discord will automaitacly create embed for it
       #if you don't want to send embed for it then do <{latest_video_url}>
 

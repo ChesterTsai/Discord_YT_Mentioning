@@ -6,9 +6,10 @@ import discord
 from discord.ext import commands, tasks
 
 TOKEN = "MTI0ODYxMjkyODYwMTcyMjk3MQ.G5S47Z.R7AgWZxHpvW_eECbxbJ-tSTpChBJZffSaM_KMY"
+file_location = "/home/chester/Desktop/program/discord/youtubedata.json"
 
 intents = discord.Intents.default()
-bot = commands.Bot(command_prefix = "!", intents = intents)
+bot = commands.Bot(command_prefix = "!", intents = intents, help_command=None)
 
 @bot.event
 async def on_ready():
@@ -21,15 +22,15 @@ async def on_ready():
 #you can check for vidoes every 10 seconds also but i would prefer to keep 30 seconds
 @tasks.loop(seconds=30)
 async def checkforvideos():
-  with open("youtubedata.json", "r") as f:
+  with open(file_location, "r") as f:
     data=json.load(f)
 
   #printing here to show
-  print("Now Checking!")
+  #print("Now Checking!")
 
   #checking for all the channels in youtubedata.json file
   for youtube_channel in data:
-    print(f"Now Checking For {data[youtube_channel]['channel_name']}")
+    #print(f"Now Checking For {data[youtube_channel]['channel_name']}")
     #getting youtube channel's url
     channel = f"https://www.youtube.com/channel/{youtube_channel}"
 
@@ -50,7 +51,7 @@ async def checkforvideos():
       data[str(youtube_channel)]['latest_video_url'] = latest_video_url
 
       #dumping the data
-      with open("youtubedata.json", "w") as f:
+      with open(file_location, "w") as f:
         json.dump(data, f)
 
       #getting the channel to send the message
@@ -59,18 +60,19 @@ async def checkforvideos():
 
       #sending the msg in discord channel
       #you can mention any role like this if you want
-      msg = f"@everyone"
+      msg = f"@everyone\n{latest_video_url}"
       #if you'll send the url discord will automaitacly create embed for it
       #if you don't want to send embed for it then do <{latest_video_url}>
 
       await discord_channel.send(msg)
+      print("New Video Info Sent!")
 
 #creating command to add more youtube accounds data in youtubedata.json file
 #you can also use has_role if you don't want to allow everyone to use this command
 @bot.command()
 @commands.has_role("Youtube")
 async def add_youtube_notification_data(ctx, channel_id: str, *, channel_name: str):
-  with open("youtubedata.json", "r") as f:
+  with open(file_location, "r") as f:
     data = json.load(f)
 
   data[str(channel_id)]={}
@@ -81,7 +83,7 @@ async def add_youtube_notification_data(ctx, channel_id: str, *, channel_name: s
   #but if the channel is same then you can also do directly
   data[str(channel_id)]["notifying_discord_channel"]="890293434856914964"
 
-  with open("youtubedata.json", "w") as f:
+  with open(file_location, "w") as f:
     json.dump(data, f)
 
   await ctx.send("Added Your Account Data!")
@@ -100,4 +102,8 @@ async def start_notifying(ctx):
   checkforvideos.start()
   await ctx.send("Now Notifying")
 
-bot.run(TOKEN)
+@bot.command()
+async def help(ctx):
+  await ctx.send("test help")
+
+bot.run(TOKEN, log_handler=None)

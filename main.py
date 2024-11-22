@@ -1,9 +1,14 @@
+# All the comments written in this file haven't been re-write.
+# Just look at the codes, not the comments
+# I don't wanna give any fucks about the comments
+
 import json
 import requests
 import re
 import os
 import discord
 import time
+import datetime
 from discord.ext import commands, tasks
 
 TOKEN = "MTI0ODYxMjkyODYwMTcyMjk3MQ.G5S47Z.R7AgWZxHpvW_eECbxbJ-tSTpChBJZffSaM_KMY"
@@ -66,46 +71,7 @@ async def checkforvideos():
       #if you don't want to send embed for it then do <{latest_video_url}>
 
       await discord_channel.send(msg)
-      print("New Video Info Sent!")
-      time.sleep(60)
-
-#creating command to add more youtube accounds data in youtubedata.json file
-#you can also use has_role if you don't want to allow everyone to use this command
-@bot.command()
-@commands.has_role("Youtube")
-async def add_youtube_notification_data(ctx, channel_id: str, *, channel_name: str):
-  with open(file_location, "r") as f:
-    data = json.load(f)
-
-  data[str(channel_id)]={}
-  data[str(channel_id)]["channel_name"]=channel_name
-  data[str(channel_id)]["latest_video_url"]="none"
-
-  #you can also get discord_channe id from the command
-  #but if the channel is same then you can also do directly
-  data[str(channel_id)]["notifying_discord_channel"]="890293434856914964"
-
-  with open(file_location, "w") as f:
-    json.dump(data, f)
-
-  await ctx.send("Added Your Account Data!")
-
-#you can also create this command if you ever want to stop notifying
-@bot.command()
-@commands.has_role("Youtube")
-async def stop_notifying(ctx):
-  checkforvideos.stop()
-  await ctx.send("Stoped Notifying")
-
-#you can also create this command to start notifying but we're gonna do so that everytime the bot goes online it will automaitacly starts notifying
-@bot.command()
-@commands.has_role("Youtube")
-async def start_notifying(ctx):
-  checkforvideos.start()
-  await ctx.send("Now Notifying")
-
-@bot.command()
-async def help(ctx):
-  await ctx.send("test help")
+      print(f'[{datetime.datetime.now().strftime("%Y/%m/%d, %H:%M:%S")} INFO] New Video Info Sent!')
+      time.sleep(300)
 
 bot.run(TOKEN, log_handler=None)

@@ -3,10 +3,11 @@ import requests
 import re
 import os
 import discord
+import time
 from discord.ext import commands, tasks
 
 TOKEN = "MTI0ODYxMjkyODYwMTcyMjk3MQ.G5S47Z.R7AgWZxHpvW_eECbxbJ-tSTpChBJZffSaM_KMY"
-file_location = "/home/chester/Desktop/program/discord/youtubedata.json"
+file_location = "youtubedata.json"
 
 intents = discord.Intents.default()
 bot = commands.Bot(command_prefix = "!", intents = intents, help_command=None)
@@ -66,6 +67,7 @@ async def checkforvideos():
 
       await discord_channel.send(msg)
       print("New Video Info Sent!")
+      time.sleep(60)
 
 #creating command to add more youtube accounds data in youtubedata.json file
 #you can also use has_role if you don't want to allow everyone to use this command

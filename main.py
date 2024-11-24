@@ -31,10 +31,13 @@ async def checkforvideos():
         # Write the role ID, not just the role name
         who_to_mention = data[youtube_channel]["who_to_mention"]
         
-        if who_to_mention == "everyone":
-            who_to_mention = "@everyone"
-        else:
-            who_to_mention = "<@&" + who_to_mention + ">"
+        match who_to_mention:
+            case "evereyone":
+                who_to_mention = "@everyone"
+            case "none":
+                who_to_mention = ""
+            case _:
+                who_to_mention = "<@&" + who_to_mention + ">"
         
         videos = requests.get(channel+"/videos").text
         shorts = requests.get(channel+"/shorts").text

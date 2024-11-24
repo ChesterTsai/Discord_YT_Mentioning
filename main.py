@@ -28,6 +28,14 @@ async def checkforvideos():
         channel = f"https://www.youtube.com/@{youtube_channel}"
         channel_name = data[youtube_channel]["channel_name"]
         
+        # Write the role ID, not just the role name
+        who_to_mention = data[youtube_channel]["who_to_mention"]
+        
+        if who_to_mention == "everyone":
+            who_to_mention = "@everyone"
+        else:
+            who_to_mention = "<@&" + who_to_mention + ">"
+        
         videos = requests.get(channel+"/videos").text
         shorts = requests.get(channel+"/shorts").text
         
@@ -48,7 +56,7 @@ async def checkforvideos():
             discord_channel_id = data[str(youtube_channel)]["notifying_discord_channel"]
             discord_channel = bot.get_channel(int(discord_channel_id))
 
-            msg = f"@everyone {channel_name}發布了新影片!\n{latest_video_url}"
+            msg = f"{who_to_mention} {channel_name}發布了新影片!\n{latest_video_url}"
 
             await discord_channel.send(msg)
             print(f'[{datetime.datetime.now().strftime("%Y/%m/%d, %H:%M:%S")} INFO] New Video Info Sent!')
@@ -64,7 +72,7 @@ async def checkforvideos():
             discord_channel_id = data[str(youtube_channel)]["notifying_discord_channel"]
             discord_channel = bot.get_channel(int(discord_channel_id))
 
-            msg = f"@everyone {channel_name}發布了新的shorts!\n{latest_shorts_url}"
+            msg = f"{who_to_mention} {channel_name}發布了新的shorts!\n{latest_shorts_url}"
 
             await discord_channel.send(msg)
             print(f'[{datetime.datetime.now().strftime("%Y/%m/%d, %H:%M:%S")} INFO] New Shorts Info Sent!')

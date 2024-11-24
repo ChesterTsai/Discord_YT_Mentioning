@@ -6,7 +6,12 @@ https://discordapp.com/api/oauth2/authorize?client_id=1248612928601722971&permis
 &emsp;	"(Youtube帳號代碼 - Youtube Handle)": <br>
 &emsp;&emsp;	{ <br>
 &emsp;&emsp;	"channel_name": "(想寫什麼都可以 - write what ever you want)", <br>
-&emsp;&emsp;	"who_to_mention": "(everyone / none / roleID)", #roleID -> discord身分組ID, discord role ID <br>
+<br>
+&emsp;&emsp;	"who_to_mention": "(everyone / none / roleID)", <br>
+// everyone -> @everyone <br>
+none -> 單純文字通知 - plain text mention <br>
+roleID -> 通知該身分組，填上discord身分組ID - mention specific role, insert discord role ID <br>
+<br>
 &emsp;&emsp;	"latest_video_url": "(會自行偵測，不必填寫 - it'll detect itself, you can leave it blank)", <br>
 &emsp;&emsp;	"latest_shorts_url": "(會自行偵測，不必填寫 - it'll detect itself, you can leave it blank)", <br>
 &emsp;&emsp;	"notifying_discord_channel": "(discord頻道ID - discord Channel ID)" <br>

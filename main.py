@@ -1,5 +1,3 @@
-# https://discordapp.com/api/oauth2/authorize?client_id=1248612928601722971&permissions=8&scope=bot
-
 import json
 import requests
 import re
@@ -9,7 +7,9 @@ import time
 import datetime
 from discord.ext import commands, tasks
 
-TOKEN = "MTI0ODYxMjkyODYwMTcyMjk3MQ.G5S47Z.R7AgWZxHpvW_eECbxbJ-tSTpChBJZffSaM_KMY"
+# TOKEN has been changed after code made public into github
+with open('token.txt') as f:
+    TOKEN = f.readline()
 file_location = "youtubedata.json"
 
 intents = discord.Intents.default()
@@ -27,8 +27,6 @@ async def checkforvideos():
     for youtube_channel in data:
         channel = f"https://www.youtube.com/@{youtube_channel}"
         channel_name = data[youtube_channel]["channel_name"]
-        
-        # Write the role ID, not just the role name
         who_to_mention = data[youtube_channel]["who_to_mention"]
         
         match who_to_mention:
@@ -80,6 +78,7 @@ async def checkforvideos():
             await discord_channel.send(msg)
             print(f'[{datetime.datetime.now().strftime("%Y/%m/%d, %H:%M:%S")} INFO] New Shorts Info Sent!')
     
-    time.sleep(300)
+    # temporary disable to cooldown and test for a while to see if multiple mentions will be re-sent incorrectly
+    # time.sleep(300)
 
 bot.run(TOKEN, log_handler=None)

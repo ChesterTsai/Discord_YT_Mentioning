@@ -22,14 +22,15 @@ async def on_ready():
 
 @tasks.loop(seconds=2)
 async def checkforvideos():
-    with open(file_location, "r") as f:
+    with open(file_location, "r", encoding='utf-8') as f:
         data = json.load(f)
     for youtube_channel in data:
-        channel = f"https://www.youtube.com/channel/{youtube_channel}"
-    
+        channel = f"https://www.youtube.com/@{youtube_channel}"
+        channel_name = data[youtube_channel]["channel_name"]
+        
         videos = requests.get(channel+"/videos").text
         shorts = requests.get(channel+"/shorts").text
-    
+        
         try:
             latest_video_url = "https://www.youtube.com/watch?v=" + re.search('(?<="videoId":").*?(?=")', videos).group()
             latest_shorts_url = "https://www.youtube.com/shorts/" + re.search('(?<="videoId":").*?(?=")', shorts).group()
@@ -41,13 +42,13 @@ async def checkforvideos():
 
             data[str(youtube_channel)]["latest_video_url"] = latest_video_url
 
-            with open(file_location, "w") as f:
+            with open(file_location, "w", encoding='utf-8') as f:
                 json.dump(data, f)
 
             discord_channel_id = data[str(youtube_channel)]["notifying_discord_channel"]
             discord_channel = bot.get_channel(int(discord_channel_id))
 
-            msg = f"@everyone\n{latest_video_url}"
+            msg = f"@everyone {channel_name}發布了新影片!\n{latest_video_url}"
 
             await discord_channel.send(msg)
             print(f'[{datetime.datetime.now().strftime("%Y/%m/%d, %H:%M:%S")} INFO] New Video Info Sent!')
@@ -57,13 +58,13 @@ async def checkforvideos():
 
             data[str(youtube_channel)]["latest_shorts_url"] = latest_shorts_url
 
-            with open(file_location, "w") as f:
+            with open(file_location, "w", encoding='utf-8') as f:
                 json.dump(data, f)
 
             discord_channel_id = data[str(youtube_channel)]["notifying_discord_channel"]
             discord_channel = bot.get_channel(int(discord_channel_id))
 
-            msg = f"@everyone\n{latest_shorts_url}"
+            msg = f"@everyone {channel_name}發布了新的shorts!\n{latest_shorts_url}"
 
             await discord_channel.send(msg)
             print(f'[{datetime.datetime.now().strftime("%Y/%m/%d, %H:%M:%S")} INFO] New Shorts Info Sent!')

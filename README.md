@@ -1,6 +1,10 @@
-# 注意 - Attention
+# token.txt
 運行這個機器人前，需要建立一個"token.txt"文件，並把機器人TOKEN寫進去<br>
 Before running this bot, you need to create a "token.txt" file, and write the Discord Bot Token in it.
+
+# youtubedata.json
+運行這個機器人前，需要將"youtubedata_example.json"更名為"youtubedata.json"，格式及注意事項在下方及"youtubedata_example.json"中<br>
+Before running this bot, you need to rename "youtubedata_example.json" into "youtubedata.json", format and more infos are both down below and in "youtubedata_example.json"
 
 # 機器人邀請連結 - Bot Invite Link:<br>
 https://discordapp.com/api/oauth2/authorize?client_id=1248612928601722971&permissions=8&scope=bot <br>

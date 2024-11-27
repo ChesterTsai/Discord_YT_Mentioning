@@ -1,1 +1,12 @@
-{"Ahuuuui0426": {"channel_name": "\u963f\u6689", "who_to_mention": "everyone", "latest_video_url": "https://www.youtube.com/watch?v=fmUtwqN66do", "latest_shorts_url": "https://www.youtube.com/shorts/wI2IxLU6BzY", "notifying_discord_channel": "1106926904126210068"}, "ahong0306": {"channel_name": "\u54f2\u745e", "who_to_mention": "none", "latest_video_url": "https://www.youtube.com/watch?v=VbECN_4srpA", "latest_shorts_url": "https://www.youtube.com/shorts/MH8yXNnl7yc", "notifying_discord_channel": "1211992363371855932"}}
+# Paste your Youtube info here, check out README.md for more info
+
+{
+  "":
+   {
+   "channel_name": "",
+   "who_to_mention": "",
+   "latest_video_url": "",
+   "latest_shorts_url": "",
+   "notifying_discord_channel": ""
+   }
+}

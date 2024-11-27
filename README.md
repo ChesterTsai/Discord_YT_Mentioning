@@ -26,7 +26,7 @@ roleID -> 通知該身分組，填上discord身分組ID - mention specific role,
 &emsp;&emsp;	} <br>
 } <br>
 
-# Example:
+### Example:
 { <br>
 &emsp;	"chester1023": <br>
 &emsp;&emsp;	{ <br>

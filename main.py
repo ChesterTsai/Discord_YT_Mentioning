@@ -30,7 +30,7 @@ async def checkforvideos():
         who_to_mention = data[youtube_channel]["who_to_mention"]
         
         match who_to_mention:
-            case "evereyone":
+            case "everyone":
                 who_to_mention = "@everyone"
             case "none":
                 who_to_mention = ""

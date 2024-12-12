@@ -81,4 +81,4 @@ async def checkforvideos():
     # temporary disable to cooldown and test for a while to see if multiple mentions will be re-sent incorrectly
     # time.sleep(300)
 
-bot.run(TOKEN, log_handler=None)
+bot.run(TOKEN)

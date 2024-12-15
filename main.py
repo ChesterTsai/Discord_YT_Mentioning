@@ -24,6 +24,7 @@ async def on_ready():
 async def checkforvideos():
     with open(file_location, "r", encoding='utf-8') as f:
         data = json.load(f)
+        f.close()
     for youtube_channel in data:
         channel = f"https://www.youtube.com/@{youtube_channel}"
         channel_name = data[youtube_channel]["channel_name"]

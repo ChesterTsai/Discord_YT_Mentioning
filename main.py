@@ -25,23 +25,17 @@ async def on_ready():
 async def checkforvideos():
     
     try:
-        with open(file_location, "r", encoding='utf-8') as f:
+        f = open(file_location, "r", encoding='utf-8')
         data = json.load(f)
         f.close()
     except FileNotFoundError:
         print(f"請至{file_location}更新使用者資訊\n Please update your info at {file_location}")
         with open(file_location, 'w', encoding='utf-8') as f:
-            data = {"(Youtube帳號代碼 - Youtube Handle)":
-                       {
-                           "channel_name": "(想寫什麼都可以 - write what ever you want)",
-                           "who_to_mention": "(everyone / none / roleID)",
-                            "latest_video_url": "(會自行偵測，不必填寫 - it'll detect itself, you can leave it blank)",
-                           "latest_shorts_url": "(會自行偵測，不必填寫 - it'll detect itself, you can leave it blank)",
-                           "notifying_discord_channel": "(discord頻道ID - discord Channel ID)"
-                       }
-                    }
-            f.write(data)
+            writeData = {"(Youtube帳號代碼 - Youtube Handle)": {"channel_name": "(想寫什麼都可以 - write what ever you want)", "who_to_mention": "(everyone / none / roleID)", "latest_video_url": "(會自行偵測，不必填寫 - it'll detect itself, you can leave it blank)", "latest_shorts_url": "(會自行偵測，不必填寫 - it'll detect itself, you can leave it blank)", "notifying_discord_channel": "(discord頻道ID - discord Channel ID)"}}
+            f.write(str(writeData))
             f.close()
+            time.sleep(10)
+            return 0
     
     for youtube_channel in data:
         channel = f"https://www.youtube.com/@{youtube_channel}"

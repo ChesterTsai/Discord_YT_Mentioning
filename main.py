@@ -10,6 +10,7 @@ from discord.ext import commands, tasks
 # TOKEN has been changed after code made public into github
 with open('token.txt') as f:
     TOKEN = f.readline()
+    f.close()
 file_location = "youtubedata.json"
 
 intents = discord.Intents.default()
@@ -22,9 +23,26 @@ async def on_ready():
 
 @tasks.loop(seconds=2)
 async def checkforvideos():
-    with open(file_location, "r", encoding='utf-8') as f:
+    
+    try:
+        with open(file_location, "r", encoding='utf-8') as f:
         data = json.load(f)
         f.close()
+    except FileNotFoundError:
+        print(f"請至{file_location}更新使用者資訊\n Please update your info at {file_location}")
+        with open(file_location, 'w', encoding='utf-8') as f:
+            data = {"(Youtube帳號代碼 - Youtube Handle)":
+                       {
+                           "channel_name": "(想寫什麼都可以 - write what ever you want)",
+                           "who_to_mention": "(everyone / none / roleID)",
+                            "latest_video_url": "(會自行偵測，不必填寫 - it'll detect itself, you can leave it blank)",
+                           "latest_shorts_url": "(會自行偵測，不必填寫 - it'll detect itself, you can leave it blank)",
+                           "notifying_discord_channel": "(discord頻道ID - discord Channel ID)"
+                       }
+                    }
+            f.write(data)
+            f.close()
+    
     for youtube_channel in data:
         channel = f"https://www.youtube.com/@{youtube_channel}"
         channel_name = data[youtube_channel]["channel_name"]

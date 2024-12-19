@@ -66,6 +66,7 @@ async def checkforvideos():
 
             with open(file_location, "w", encoding='utf-8') as f:
                 json.dump(data, f)
+                f.close()
 
             discord_channel_id = data[str(youtube_channel)]["notifying_discord_channel"]
             discord_channel = bot.get_channel(int(discord_channel_id))
@@ -82,6 +83,7 @@ async def checkforvideos():
 
             with open(file_location, "w", encoding='utf-8') as f:
                 json.dump(data, f)
+                f.close()
 
             discord_channel_id = data[str(youtube_channel)]["notifying_discord_channel"]
             discord_channel = bot.get_channel(int(discord_channel_id))

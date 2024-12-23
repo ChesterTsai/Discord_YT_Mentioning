@@ -14,14 +14,14 @@ with open('token.txt') as f:
 file_location = "youtubedata.json"
 
 intents = discord.Intents.default()
-bot = commands.Bot(command_prefix = "!", intents = intents, help_command=None)
+bot = commands.Bot(command_prefix = "!", intents=intents, help_command=None)
 
 @bot.event
 async def on_ready():
     print("Bot Now Online!")
     checkforvideos.start()
 
-@tasks.loop(seconds=2)
+@tasks.loop(seconds=30)
 async def checkforvideos():
     
     try:

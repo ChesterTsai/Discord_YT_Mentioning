@@ -93,6 +93,6 @@ async def checkforvideos():
             await discord_channel.send(msg)
             print(f'[{datetime.datetime.now().strftime("%Y/%m/%d, %H:%M:%S")} INFO] New Shorts Info Sent!')
     
-    time.sleep(300)
+    # time.sleep(300)
 
 bot.run(TOKEN)

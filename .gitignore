@@ -1,2 +1,5 @@
-token.txt
+Admin.txt
+__pycache__/
+.env
+bot.sh
 youtubedata.json

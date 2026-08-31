@@ -1,98 +1,114 @@
-import json
-import requests
-import re
-import os
+"""
+# to generate "requirements.txt", do:
+# pipreqs /path/to/project
+"""
+#https://discord.com/oauth2/authorize?client_id=1248612928601722971
+
+
 import discord
-import time
+from discord.ext import commands
+from discord.ext import tasks
+from dotenv import load_dotenv
+import os
 import datetime
-from discord.ext import commands, tasks
+import asyncio
+import random
+import time
 
-# TOKEN has been changed after code made public into github
-with open('token.txt') as f:
-    TOKEN = f.readline()
-    f.close()
-file_location = "youtubedata.json"
-
-intents = discord.Intents.default()
-bot = commands.Bot(command_prefix = "!", intents=intents, help_command=None)
+load_dotenv()
+TOKEN = os.getenv("DISCORD_TOKEN")
+bot = commands.Bot(command_prefix = '', intents = discord.Intents.all(), case_insensitive=True)
 
 @bot.event
 async def on_ready():
-    print("Bot Now Online!")
-    checkforvideos.start()
+    await bot.change_presence(activity=discord.CustomActivity(name=f'今年已經過了{int((time.time() / 315576) % 100)}%'))
+    print(f'[{datetime.datetime.now().strftime("%Y/%m/%d, %H:%M:%S")} INFO] Bot is ready')
 
-@tasks.loop(seconds=30)
-async def checkforvideos():
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        return 0
+
+async def loadCogOnStartUp():
+    for filename in os.listdir("./cogs"):
+        if filename.endswith(".py"):
+            await bot.load_extension(f"cogs.{filename[:-3]}")
+
+@bot.command(hidden=True)
+async def load(ctx, cog: str):
+    """load a newly added cog"""
     
+    # See if "Admin.txt" exists, if not, create one.
     try:
-        f = open(file_location, "r", encoding='utf-8')
-        data = json.load(f)
+        f = open('./data/Admin.txt', 'r', encoding='utf-8')
+        tmp = f.read()
+        ADMIN_ID_LIST = tmp.split('\n')
         f.close()
     except FileNotFoundError:
-        print(f"請至{file_location}更新使用者資訊\n Please update your info at {file_location}")
-        with open(file_location, 'w', encoding='utf-8') as f:
-            writeData = {"(Youtube帳號代碼 - Youtube Handle)": {"channel_name": "(想寫什麼都可以 - write what ever you want)", "who_to_mention": "(everyone / none / roleID)", "latest_video_url": "(會自行偵測，不必填寫 - it'll detect itself, you can leave it blank)", "latest_shorts_url": "(會自行偵測，不必填寫 - it'll detect itself, you can leave it blank)", "notifying_discord_channel": "(discord頻道ID - discord Channel ID)"}}
-            f.write(str(writeData))
+        await ctx.send("建立機器人維護者資料...")
+        with open('./data/Admin.txt', 'w', encoding='utf-8') as f:
+            f.write("")
             f.close()
-            time.sleep(10)
-            return 0
+        await ctx.send("建立完成")
     
-    for youtube_channel in data:
-        channel = f"https://www.youtube.com/@{youtube_channel}"
-        channel_name = data[youtube_channel]["channel_name"]
-        who_to_mention = data[youtube_channel]["who_to_mention"]
-        
-        match who_to_mention:
-            case "everyone":
-                who_to_mention = "@everyone"
-            case "none":
-                who_to_mention = ""
-            case _:
-                who_to_mention = "<@&" + who_to_mention + ">"
-        
-        videos = requests.get(channel+"/videos").text
-        shorts = requests.get(channel+"/shorts").text
-        
-        try:
-            latest_video_url = "https://www.youtube.com/watch?v=" + re.search('(?<="videoId":").*?(?=")', videos).group()
-            latest_shorts_url = "https://www.youtube.com/shorts/" + re.search('(?<="videoId":").*?(?=")', shorts).group()
-        except:
-            continue
+    if str(ctx.message.author.id) not in ADMIN_ID_LIST:
+        await ctx.send("錯誤，不是機器人維護者")
+        return 0
     
-        # New Video Mentioning
-        if not str(data[youtube_channel]["latest_video_url"]) == latest_video_url:
+    await bot.load_extension(f"cogs.{cog}")
+    await ctx.send("已載入")
 
-            data[str(youtube_channel)]["latest_video_url"] = latest_video_url
-
-            with open(file_location, "w", encoding='utf-8') as f:
-                json.dump(data, f)
-                f.close()
-
-            discord_channel_id = data[str(youtube_channel)]["notifying_discord_channel"]
-            discord_channel = bot.get_channel(int(discord_channel_id))
-
-            msg = f"{who_to_mention} {channel_name}發布了新影片!\n{latest_video_url}"
-
-            await discord_channel.send(msg)
-            print(f'[{datetime.datetime.now().strftime("%Y/%m/%d, %H:%M:%S")} INFO] New Video Info Sent!')
+@bot.command(hidden=True)
+async def reload(ctx, cog: str):
+    """reload certain cog"""
     
-        # New Shorts Mentioning
-        if not str(data[youtube_channel]["latest_shorts_url"]) == latest_shorts_url:
-
-            data[str(youtube_channel)]["latest_shorts_url"] = latest_shorts_url
-
-            with open(file_location, "w", encoding='utf-8') as f:
-                json.dump(data, f)
-                f.close()
-
-            discord_channel_id = data[str(youtube_channel)]["notifying_discord_channel"]
-            discord_channel = bot.get_channel(int(discord_channel_id))
-
-            msg = f"{who_to_mention} {channel_name}發布了新的shorts!\n{latest_shorts_url}"
-
-            await discord_channel.send(msg)
-            print(f'[{datetime.datetime.now().strftime("%Y/%m/%d, %H:%M:%S")} INFO] New Shorts Info Sent!')
+    # See if "Admin.txt" exists, if not, create one.
+    try:
+        f = open('./data/Admin.txt', 'r', encoding='utf-8')
+        tmp = f.read()
+        ADMIN_ID_LIST = tmp.split('\n')
+        f.close()
+    except FileNotFoundError:
+        await ctx.send("建立機器人維護者資料...")
+        with open('./data/Admin.txt', 'w', encoding='utf-8') as f:
+            f.write("")
+            f.close()
+        await ctx.send("建立完成")
     
-    # time.sleep(300)
+    if str(ctx.message.author.id) not in ADMIN_ID_LIST:
+        await ctx.send("錯誤，不是機器人維護者")
+        return 0
+    
+    await bot.reload_extension(f"cogs.{cog}")
+    await ctx.send("已刷新")
 
-bot.run(TOKEN)
+@bot.command(hidden=True)
+async def unload(ctx, cog: str):
+    """unload certain cog"""
+    
+    # See if "Admin.txt" exists, if not, create one.
+    try:
+        f = open('./data/Admin.txt', 'r', encoding='utf-8')
+        tmp = f.read()
+        ADMIN_ID_LIST = tmp.split('\n')
+        f.close()
+    except FileNotFoundError:
+        await ctx.send("建立機器人維護者資料...")
+        with open('./data/Admin.txt', 'w', encoding='utf-8') as f:
+            f.write("")
+            f.close()
+        await ctx.send("建立完成")
+    
+    if str(ctx.message.author.id) not in ADMIN_ID_LIST:
+        await ctx.send("錯誤，不是機器人維護者")
+        return 0
+    
+    await bot.unload_extension(f"cogs.{cog}")
+    await ctx.send("已取消載入")
+
+async def main():
+    async with bot:
+        await loadCogOnStartUp()
+        await bot.start(TOKEN)
+
+asyncio.run(main())

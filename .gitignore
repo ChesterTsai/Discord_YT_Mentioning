@@ -1,4 +1,4 @@
-Admin.txt
+./data/Admin.txt
 __pycache__/
 .env
 bot.sh

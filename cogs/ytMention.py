@@ -70,14 +70,14 @@ class ytMention(commands.Cog):
         if who_to_mention.startswith("\\<@&"):
             who_to_mention = who_to_mention[4:-1]
         
-        await ctx.send("是否傳送影片縮圖 (Y/n)")
+        await ctx.send("是否傳送影片縮圖 (y/n)")
         sendThumbnail = await self.bot.wait_for("message", check = check)
         sendThumbnail = sendThumbnail.content
         if sendThumbnail.lower() != "y" and sendThumbnail.lower() != "n":
             await ctx.channel.send('錯誤的選項')
             return
         
-        await ctx.send("請接收通知的discord頻道ID")
+        await ctx.send("請輸入接收通知的discord頻道ID")
         notifying_discord_channel = await self.bot.wait_for("message", check = check)
         notifying_discord_channel = notifying_discord_channel.content
         if not self.bot.get_channel(int(notifying_discord_channel)):
@@ -87,7 +87,6 @@ class ytMention(commands.Cog):
         if notifying_discord_guild != ctx.guild.id:
             await ctx.channel.send('基於安全性原因，請勿對其他伺服器的頻道進行操作')
             return
-        
         writeData(channel_link, channel_name, who_to_mention, sendThumbnail.lower(), notifying_discord_channel)
         await ctx.send("寫入成功!")
 
@@ -229,16 +228,29 @@ def readData():
 def writeData(channel_link: str, channel_name: str, who_to_mention: str, sendThumbnail: str, notifying_discord_channel: str):
     data = readData()
 
-    data[channel_link][notifying_discord_channel] = {
-        "channel_name": channel_name,
-        "who_to_mention": who_to_mention,
-        "latest_video_url": "",
-        "latest_shorts_url": "",
-        "latest_streams_url": "",
-        "latest_upload_date": "",
-        "sendThumbnail": sendThumbnail
-    }
-    
+    if channel_link in data:
+        data[channel_link][notifying_discord_channel] = {
+            "channel_name": channel_name,
+            "who_to_mention": who_to_mention,
+            "latest_video_url": "",
+            "latest_shorts_url": "",
+            "latest_streams_url": "",
+            "latest_upload_date": "",
+            "sendThumbnail": sendThumbnail
+        }
+    else:
+        data[channel_link] = {
+            notifying_discord_channel: {
+                "channel_name": channel_name,
+                "who_to_mention": who_to_mention,
+                "latest_video_url": "",
+                "latest_shorts_url": "",
+                "latest_streams_url": "",
+                "latest_upload_date": "",
+                "sendThumbnail": sendThumbnail
+            }
+        }
+
     with open(file_location, "w", encoding='utf-8') as f:
         json.dump(data, f, indent = 4)
         f.close()

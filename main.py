@@ -2,8 +2,6 @@
 # to generate "requirements.txt", do:
 # pipreqs /path/to/project
 """
-#https://discord.com/oauth2/authorize?client_id=1248612928601722971
-
 
 import discord
 from discord.ext import commands
@@ -17,11 +15,11 @@ import time
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
-bot = commands.Bot(command_prefix = '', intents = discord.Intents.all(), case_insensitive=True)
+bot = commands.Bot(command_prefix = '!', intents = discord.Intents.all(), case_insensitive=True)
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.CustomActivity(name=f'今年已經過了{int((time.time() / 315576) % 100)}%'))
+    await bot.change_presence(activity=discord.CustomActivity(name=f'正在查詢最新影片...'))
     print(f'[{datetime.datetime.now().strftime("%Y/%m/%d, %H:%M:%S")} INFO] Bot is ready')
 
 @bot.event

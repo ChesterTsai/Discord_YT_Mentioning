@@ -13,10 +13,39 @@ REQUEST_TIMEOUT = 10  # 每個網頁請求的逾時秒數
 class ytLoop(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.badChannels = set()  # 已經回報過「找不到」的頻道ID，避免每 30 秒重複洗版
         self.ytLoop.start()
 
     def cog_unload(self):
         self.ytLoop.cancel()
+
+    async def getNotifyChannel(self, discord_channel_id):
+        """取得要通知的頻道：快取找不到就向 Discord 查詢，還是不行就回傳 None 並說明原因"""
+        channel_id = int(discord_channel_id)
+        channel = self.bot.get_channel(channel_id)
+
+        if channel is None:
+            try:
+                channel = await self.bot.fetch_channel(channel_id)
+            except discord.NotFound:
+                reason = "404 找不到：機器人不在該頻道所在的伺服器、頻道已被刪除，或這個 ID 不屬於這隻機器人能看到的地方"
+            except discord.Forbidden:
+                reason = "403 沒有權限：機器人沒有檢視該頻道的權限"
+            except discord.HTTPException as e:
+                reason = f"HTTP 錯誤 {e.status}"
+            else:
+                if not isinstance(channel, discord.abc.Messageable):
+                    reason = "這個 ID 不是可以發訊息的頻道（可能是分類或論壇）"
+                    channel = None
+
+        if channel is None:
+            if discord_channel_id not in self.badChannels:
+                self.badChannels.add(discord_channel_id)
+                print(f'[{datetime.datetime.now().strftime("%Y/%m/%d, %H:%M:%S")} ERROR] 無法取得頻道 {discord_channel_id}：{reason}')
+            return None
+
+        self.badChannels.discard(discord_channel_id)
+        return channel
 
     @tasks.loop(seconds=30)
     async def ytLoop(self):
@@ -41,6 +70,10 @@ class ytLoop(commands.Cog):
                         case _:
                             who_to_mention = "<@&" + who_to_mention + ">"
                 
+                    notify_channel = await self.getNotifyChannel(dc_id)
+                    if notify_channel is None:
+                        continue
+
                     # requests 是同步的，用 fetchText 丟到 thread 並行抓取，避免卡住整個機器人
                     try:
                         videos, shorts, streams, featured = await asyncio.gather(
@@ -77,11 +110,11 @@ class ytLoop(commands.Cog):
                             video_id = video_id[1]
                             thumbnail_url = "http://img.youtube.com/vi/%s/maxresdefault.jpg" % video_id
                             msg = msg + f"<{latest_video_url}>"
-                            await self.bot.get_channel(int(dc_id)).send(msg)
-                            await self.bot.get_channel(int(dc_id)).send(f"{thumbnail_url}")
+                            await notify_channel.send(msg)
+                            await notify_channel.send(f"{thumbnail_url}")
                         else:
                             msg = msg + f"{latest_video_url}"
-                            await self.bot.get_channel(int(dc_id)).send(msg)
+                            await notify_channel.send(msg)
 
                         # 訊息送出成功之後才記錄，送失敗的話下一輪還會再通知
                         updateEntry(youtube_channel, dc_id,
@@ -103,7 +136,7 @@ class ytLoop(commands.Cog):
                             msg = f"{who_to_mention} {channel_name}發布了新的shorts!\n"
                             msg += f"{channel_name} has uploaded a new short!\n{latest_shorts_url}"
 
-                            await self.bot.get_channel(int(dc_id)).send(msg)
+                            await notify_channel.send(msg)
                             updateEntry(youtube_channel, dc_id,
                                         latest_upload_date = shorts_upload_date,
                                         latest_shorts_url = latest_shorts_url)
@@ -124,7 +157,7 @@ class ytLoop(commands.Cog):
                             msg = f"{who_to_mention} {channel_name}開台了!\n"
                             msg += f"{channel_name} has went on live!\n{latest_streams_url}"
 
-                            await self.bot.get_channel(int(dc_id)).send(msg)
+                            await notify_channel.send(msg)
                             updateEntry(youtube_channel, dc_id,
                                         latest_upload_date = stream_date,
                                         latest_streams_url = latest_streams_url)
